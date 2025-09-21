@@ -5,6 +5,7 @@ import argparse
 
 class MakeInstanceBBOX:
     def __init__(self):
+        self.m_argparser = argparse.ArgumentParser()
         self.m_output_prefix = ""
         self.m_library = ""
         self.m_cell = ""
