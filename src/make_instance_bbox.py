@@ -41,6 +41,7 @@ class MakeInstanceBBOX:
 
     def run_vse_skill(self):
         print(f"# run vse skill start")
+        # TODO
         print(f"# run vse skill end")
 
     def move_instance_bbox_file(self):

@@ -14,7 +14,9 @@ def test_make_rca():
     instance_current_file = "tests/test.i.txt"
     layer = "BP"
     net = "VDD"
+    level = "--level 0"
     #
+    # args = f"make_cell_path.py {output_prefix} {instance_bbox_file} {instance_current_file} {layer} {net} {level}"
     args = f"make_cell_path.py {output_prefix} {instance_bbox_file} {instance_current_file} {layer} {net}"
     #
     my_make_cell_path = make_rca.MakeRCA()

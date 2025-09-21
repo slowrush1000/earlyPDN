@@ -1,6 +1,7 @@
 import sys
 import argparse
 import copy
+import numpy as np
 
 
 class Point:
@@ -206,7 +207,7 @@ class Tree:
     ):
         if 0 == len(parent.get_children()):
             rca_file.write(
-                f"{hier_path} {layer_name} {net_name} - {parent.get_instance().get_box().get_str()} {probe_distance}\n"
+                f"{hier_path} {layer_name} {net_name} - {parent.get_instance().get_current_A()} {parent.get_instance().get_box().get_str()} {probe_distance}\n"
             )
         else:
             for child_name in parent.get_children():
@@ -234,6 +235,7 @@ class MakeRCA:
         self.m_instance_current_file_name = ""
         self.m_layer_name = ""
         self.m_net_name = ""
+        self.m_level = np.iinfo(np.int32).max
         #
         self.m_total_current_A = 0.0
         #
@@ -258,6 +260,12 @@ class MakeRCA:
         )
         self.m_argparser.add_argument("layer", type=str, help="layer name")
         self.m_argparser.add_argument("net", type=str, help="net name")
+        self.m_argparser.add_argument(
+            "--level",
+            type=int,
+            default=np.iinfo(np.int32).max,
+            help="hierarchical level(0~)",
+        )
         #
         args = self.m_argparser.parse_args(args[1:])
         #
@@ -266,6 +274,7 @@ class MakeRCA:
         self.m_instance_current_file_name = args.instance_current_file
         self.m_layer_name = args.layer
         self.m_net_name = args.net
+        self.m_level = args.level
         #
         print(f"# read args end")
 
@@ -276,6 +285,7 @@ class MakeRCA:
         print(f"instance current file   : {self.m_instance_current_file_name}")
         print(f"layer                   : {self.m_layer_name}")
         print(f"net                     : {self.m_net_name}")
+        print(f"level                   : {self.m_level}")
         print(f"# print inputs end")
 
     def read_instance_current_file(self):
@@ -301,7 +311,7 @@ class MakeRCA:
             if 2 != len(tokens):
                 continue
             #
-            instance_path = tokens[0]
+            instance_path = self.get_instance_path(tokens[0])
             instance_paths = instance_path.split(".")
             current_A = float(tokens[1])
             self.add_total_current_A(current_A)
@@ -314,6 +324,14 @@ class MakeRCA:
         print(
             f"# read instance current file({self.m_instance_current_file_name}) start"
         )
+
+    def get_instance_path(self, name):
+        instance_path = name
+        tokens = instance_path.split(".")
+        if len(tokens) < self.m_level:
+            return instance_path
+        else:
+            return ".".join(tokens[0 : self.m_level + 1])
 
     # cell_path
     #   instance_path (cx,cy) ((llx,lly) (urx,ury)
